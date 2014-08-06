@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html> 
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>
+</title>
+<link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">    
+<link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
+<link rel="stylesheet" type="text/css" href="../css/layout.css">
+<link rel="stylesheet" type="text/css" href="../css/chromepopup.css">
+
+<script type="text/javascript">
+  var dojoConfig = {
+    parseOnLoad: true
+  };
+</script>
+
+<script src="//js.arcgis.com/3.10/"></script>
+
+<script type="text/javascript">
+dojo.require("dijit.dijit"); // optimize: load dijit layer
+dojo.require("dijit.layout.BorderContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.layout.StackContainer");
+</script>
+
+<script src="../javascript/WMSLayerSLD.js"></script>
+
+
+
+<script type="text/javascript">     
+ 
+function init(){
+      	
+        require(["esri/map", "esri/dijit/LayerSwipe", "esri/config","dojo/domReady!"],
+        function(Map, LayerSwipe, esriConfig) {
+            
+            esriConfig.defaults.io.proxyUrl  =  location.protocol + '//' + location.host + "/sharing/proxy.ashx";
+            esriConfig.defaults.io.alwaysUseProxy = false;
+            
+            map = new Map("map", {
+              center: [-77.491663, 39.012555],
+              zoom: 8,
+              basemap: "oceans"
+            });
+                        
+            var wmsLayerSLDURL = new WMSLayerSLD("http://dtc-sci02.esri.com/arcgis/services/OGC_Videos/MD_Counties_SLD/MapServer/WMSServer");
+            wmsLayerSLDURL.setSLDURL("http://dtc-sci01.esri.com/OGCApps/OpenLayersApp/styles/MDCountiesServer.xml",	"propertyTaxRate");
+            map.addLayer(wmsLayerSLDURL);
+            
+            var wms_incomeTaxSLD = new WMSLayerSLD("http://dtc-sci02.esri.com/arcgis/services/OGC_Videos/MD_Counties_SLD/MapServer/WMSServer");
+            wms_incomeTaxSLD.setStyleType("personalTaxRate");
+            map.addLayer(wms_incomeTaxSLD);
+            
+            var swipeWidget = new LayerSwipe({
+            type: "vertical",  //Try switching to "scope" or "horizontal"
+            map: map,
+            layers: [wms_incomeTaxSLD]
+          }, "swipeDiv");
+          swipeWidget.startup();
+
+  	});
+
+}
+//show map on load 
+dojo.addOnLoad(init);
+</script>
+</head>
+
+<body onResize="resetLayout()" class="claro">
+<div id="mainWindow" data-dojo-type="dijit.layout.BorderContainer"  data-dojo-props='design:"headline",gutters:false' style="width:100%; height:100%;">
+
+<!-- Header Section-->
+<div id="header" data-dojo-type="dijit.layout.ContentPane" data-dojo-props='region:"top"'>
+  <div id="title">WMS with SLD Examples
+  </div>
+  <div id="subtitle">This example shows the new capability within ArcGIS for Server 10.2.1 to serve out a netCDF file as a WMS with time and an n dimension such as depth
+  </div>
+<div id="header_flourish"></div>
+
+</div>
+
+<!-- Map Section -->
+<div id="map" data-dojo-type="dijit.layout.ContentPane" data-dojo-props='region:"center"' style='padding:0px'>
+    <div id="swipeDiv"></div>
+</div>
+
+
+
+</body>
+
+</html>
